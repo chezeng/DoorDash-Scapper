@@ -1,0 +1,107 @@
+Experiment 1: Basic Action-to-Code Conversion
+Prompt:
+text
+
+Collapse
+
+Unwrap
+
+Copy
+Given this demonstration action: "Click on the '#1 most liked' item to view details", generate a Playwright command. Assume the HTML snapshot shows a div with class "menu-item" and text "#1 most liked".
+Expected Output:
+python
+
+Collapse
+
+Unwrap
+
+Copy
+await page.wait_for_selector('.menu-item:has-text("#1 most liked")', state='visible')
+await page.click('.menu-item:has-text("#1 most liked")')
+Notes: Tests LLM’s ability to map natural language to Playwright syntax with a specific selector.
+Experiment 2: Handling Input Fields
+Prompt:
+text
+
+Collapse
+
+Unwrap
+
+Copy
+Convert this action: "Type '2390 el camino real' into the delivery address input field." Assume the HTML snapshot has: <input placeholder="Enter delivery address" id="address-input">.
+Provide robust Playwright code with error handling.
+Expected Output:
+python
+
+Collapse
+
+Unwrap
+
+Copy
+try:
+    await page.wait_for_selector('#address-input', state='visible', timeout=10000)
+    await page.fill('#address-input', '2390 el camino real')
+except Exception as e:
+    print(f"Failed to fill address field: {e}")
+Notes: Ensures the LLM adds robustness (waits, timeouts) and uses snapshot data.
+Experiment 3: Full Subtask Translation
+Prompt:
+text
+
+Collapse
+
+Unwrap
+
+Copy
+Given this subtask:
+{
+  "description": "Enter and select the delivery address.",
+  "action_descriptions": [
+    "Click on the delivery address input field.",
+    "Type '2390 el camino real' into the delivery address input field.",
+    "Click on the suggested address '2390 El Camino Real'."
+  ]
+}
+Generate a Playwright script snippet. Use the HTML snapshot context: <input id="address-input"> and <div class="suggestion">2390 El Camino Real</div>.
+Expected Output:
+python
+
+Collapse
+
+Unwrap
+
+Copy
+# Enter and select the delivery address
+await page.wait_for_selector('#address-input', state='visible')
+await page.click('#address-input')
+await page.fill('#address-input', '2390 el camino real')
+await page.wait_for_selector('.suggestion:has-text("2390 El Camino Real")', state='visible')
+await page.click('.suggestion:has-text("2390 El Camino Real")')
+await page.wait_for_timeout(500)
+Notes: Tests LLM’s ability to chain actions and integrate snapshot-derived selectors.
+Experiment 4: Robustness with Transitions
+Prompt:
+text
+
+Collapse
+
+Unwrap
+
+Copy
+Using this transition: "After clicking on the 'most liked' item, the page transitioned to a detailed view of the Burrito Bowl", and action: "Click on the '#1 most liked' item to view details", generate a Playwright snippet that waits for the transition. Assume the snapshot shows a new div with class "item-details".
+Expected Output:
+python
+
+Collapse
+
+Unwrap
+
+Copy
+await page.wait_for_selector('text="#1 most liked"', state='visible')
+await page.click('text="#1 most liked"')
+await page.wait_for_selector('.item-details', state='visible', timeout=5000)
+Notes: Explores how the LLM uses transition_descriptions to add wait conditions.
+Simulated Workflow
+Input: Feed the full JSON and HTML snapshots (from the Google Drive link) to ChatGPT.
+Prompt: “Convert this UberEats demonstration JSON into a Playwright script. Use the HTML snapshots to identify precise selectors and ensure robustness with waits and error handling.”
+Iterate: Refine prompts based on output, e.g., “Add comments from trajectory descriptions” or “Handle missing elements gracefully.”
